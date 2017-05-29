@@ -4,9 +4,11 @@ import numpy as np
 
 from transform import *
 
-def load_image(_img, to_be_domed = False, to_be_fisheye = False, to_be_expanded = False, to_be_diminished = False,
-               to_be_diminished_2 = False):
-    img = imutils.resize(cv2.imread(_img, -1), height=400)
+
+def load_image(_img, to_be_domed=False, to_be_fisheye=False, to_be_expanded=False, to_be_diminished=False,
+               to_be_diminished_2=False):
+    image = cv2.imread(_img, cv2.IMREAD_UNCHANGED)
+    img = imutils.resize(image, height=400)
     img = np.array(img)
     img[img == 0] = 1
 

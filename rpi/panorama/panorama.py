@@ -9,20 +9,21 @@ from os.path import isfile, join, exists
 
 import sys
 
-from utils import load_image
+from utilsImage import load_image
 from transform import *
 import math
 
 import datetime
 
-'''Each time when stitch 2 images, we should initialize
+'''Each time when stitch 2 image_files, we should initialize
 a new of object of class Stitcher'''
 
-class Stitcher:
 
+class Stitcher:
     '''This init function does nothing but
     enumerate all the attributes we will use
     '''
+
     def __init__(self):
 
         '''image on the left'''
@@ -46,9 +47,9 @@ class Stitcher:
         self.r_features = None
         self.r_pts = None
 
-        '''Homography matrix for stitching images'''
+        '''Homography matrix for stitching image_files'''
         self.homo = None
-        '''The matches of keypoints in 2 images'''
+        '''The matches of keypoints in 2 image_files'''
         self.matches = None
         '''Status of the matches'''
         self.status = None
@@ -56,7 +57,8 @@ class Stitcher:
         '''This attribute contains the best result so far when loop'''
         self.coolest = None
 
-    '''Main function, do stitch 2 images'''
+    '''Main function, do stitch 2 image_files'''
+
     def stitch(self, images, ratio=0.6, reprojThresh=4.0, firstTime=False,
                l_ori_kps=None, l_features=None, l_deg=None):
 
@@ -107,7 +109,7 @@ class Stitcher:
 
             return (sum(error), H)
 
-        '''unpack the images'''
+        '''unpack the image_files'''
         (self.image_left, self.image_right) = images
 
         '''if the left image had been processed, take the it's params
@@ -129,13 +131,13 @@ class Stitcher:
         self.r_kps = np.copy(kps)
         self.r_features = np.copy(features)
 
-        '''match keypoints of these 2 images'''
+        '''match keypoints of these 2 image_files'''
         matchResult = self.matchKeypoints(self.r_kps, self.l_kps,
                                           self.r_features, self.l_features, ratio, reprojThresh)
 
-        '''if 2 images are not matched, just concatenate them and return'''
+        '''if 2 image_files are not matched, just concatenate them and return'''
         if matchResult is None:
-            print 'images are not match!'
+            print 'image_files are not match!'
             return np.hstack((self.image_left, self.image_right))
 
         '''if matched successfully, extract the needed values'''
@@ -152,7 +154,7 @@ class Stitcher:
         '''Initialize the best result as a very bad result (error = 999)'''
         self.coolest = [999, None, 0, 0]
 
-        '''If firstTime==True, we must bend both of the images
+        '''If firstTime==True, we must bend both of the image_files
         else, we only need to bend the right image'''
         if firstTime:
             '''define the values of focal length we will try'''
@@ -181,7 +183,7 @@ class Stitcher:
         '''Save the best result'''
         self.best_f = self.coolest[2:]
         self.homo = self.coolest[1]
-        '''Keep the images not being skew'''
+        '''Keep the image_files not being skew'''
         self.homo[0, 1] = self.homo[1, 0] = self.homo[2, 0] = self.homo[2, 1] = 0
 
         '''bend the image by their fcl'''
@@ -200,10 +202,10 @@ class Stitcher:
                                                   (image_left.shape[1] + int(self.homo[0, 2]),
                                                    image_left.shape[0]),
                                                   borderMode=cv2.BORDER_CONSTANT, borderValue=0)
-        print 'best f:', self.best_f
-        print 'homo: ', self.homo
+        # print 'best f:', self.best_f
+        # print 'homo: ', self.homo
 
-        '''Paste the 2 images into 1, apply some blending tricks'''
+        '''Paste the 2 image_files into 1, apply some blending tricks'''
         result = self.paste_4(image_left, image_right_wrapped, moved=self.homo[0, 2])
         '''Trim, if necessary'''
         result = self.trimSurplusCols(result)
@@ -219,6 +221,7 @@ class Stitcher:
         return result, self.r_kps, self.r_features, self.best_f[1]
 
     '''Calibrate (bend) an image, by using ellipse equation'''
+
     def ellipse_calibration(self, shape, kps, deg):
         (rows, cols) = shape
         a = int(cols / 2)
@@ -242,6 +245,7 @@ class Stitcher:
 
     '''Calibrate (bend) an image, to spherical view
     (kind of like a fisheye effect)'''
+
     def spherical_calibration(self, shape, kps, fcl):
         rows, cols = shape
         x_mid = int(cols / 2)
@@ -263,6 +267,7 @@ class Stitcher:
         return new_kps
 
     '''Some blending options'''
+
     def paste(self, left_img, right_img, moved):
         fade_min = int(moved)
         fade_length = left_img.shape[1] - fade_min
@@ -363,6 +368,7 @@ class Stitcher:
         return result
 
     '''Trim surplus columns'''
+
     def trimSurplusCols(self, img):
 
         rows, cols = img.shape[:2]
@@ -385,6 +391,7 @@ class Stitcher:
 
     '''This function return keypoints'
     locations and descriptors'''
+
     def detectAndDescribe(self, image):
 
         '''detect and extract features'''
@@ -396,7 +403,8 @@ class Stitcher:
 
         return (kps, features)
 
-    '''From 2 sets of keypoints (of 2 images), find the matches'''
+    '''From 2 sets of keypoints (of 2 image_files), find the matches'''
+
     def matchKeypoints(self, kpsA, kpsB, featuresA, featuresB, ratio, reprojThresh):
         # compute the raw matches and initialize the list of actual
         # matches
@@ -429,6 +437,7 @@ class Stitcher:
         return None
 
     '''Visualize the matches, use for debugging'''
+
     def drawMatches(self, imageA, imageB, kpsA, kpsB, matches, status):
 
         matches = [(v, u) for u, v in matches]
@@ -454,6 +463,7 @@ class Stitcher:
         return vis
 
     '''Visualize the keypoints, also use for debugging'''
+
     def drawKps(self, input_image, kps):
         image = np.copy(input_image)
         # print 'Drawing'
@@ -466,29 +476,46 @@ class Stitcher:
 
 
 if __name__ == '__main__':
+    try:
+        input_file_list = sys.argv[1]
+        output_file = sys.argv[2]
+    except:
+        input_file_list = "files0.txt"
+        output_file = 'test.jpg'
+    finally:
+        print "Parameters : ", input_file_list, output_file
+
+    fp = open(input_file_list, 'r')
+    _images = [each.rstrip('\r\n') for each in fp.readlines()]
 
     '''Timing'''
     begin_time = datetime.datetime.now()
 
-    '''Define directory of images, prepare to stitch
-    images in that directory
-    The order of the images must be from left to right in the result'''
-    _cur_folder = os.path.dirname(os.path.realpath(sys.argv[0]))
+    '''Define directory of image_files, prepare to stitch
+    image_files in that directory
+    The order of the image_files must be from left to right in the result'''
+    begin_time = datetime.datetime.now()
 
-    _imageDirectory = _cur_folder
+    '''if less than 2 image_files, so nothing to stitch'''
+    if len(_images) < 2:
+        print '[>>Error<<] There is %d image' % (len(_images))
+        exit(0)
+    print 'Images: ', _images, '\n\n'
+
+    '''Load the to-be-stitched image_files beforehand'''
     images = []
-    images.append(os.path.join(_cur_folder, 'IMG_20170524_185526.jpg'))
-    images.append(os.path.join(_cur_folder, 'IMG_20170524_185529.jpg'))
+    for _image in _images:
+        images.append(load_image(_image))
 
-    '''stitch the first 2 images
-    because this is the first 2 images to be stitched, set firstTime=True
+    '''stitch the first 2 image_files
+    because this is the first 2 image_files to be stitched, set firstTime=True
     kps contains the position of the keypoints
     features contains the descriptors of the corresponding keypoints
     deg is the degree the right image had been bent'''
     stitcher = Stitcher()
     result, kps, features, deg = stitcher.stitch([images[0], images[1]], firstTime=True)
 
-    '''Continuously stitch the result with the other images,
+    '''Continuously stitch the result with the other image_files,
     each time, an image is stitched to the right of the previous-result image'''
     for idx in range(2, len(images)):
         stitcher = Stitcher()
@@ -496,19 +523,19 @@ if __name__ == '__main__':
                                                      firstTime=False, l_ori_kps=kps,
                                                      l_features=features, l_deg=deg)
 
-    print 'elapsed time:', datetime.datetime.now() - begin_time
+    print 'Elapsed time:', datetime.datetime.now() - begin_time
 
     '''Show and save the result'''
-    cv2.imshow('pano', result)
-    cv2.imwrite('panoramo11.jpg', result)
-    cv2.waitKey(0)
+    cv2.imwrite(output_file, result)
+    # cv2.imshow('pano', result)
+    # cv2.waitKey(0)
 
 
 
 '''
 Some optimizations (or modifications) can be done later:
-    Not gradually stitch images from left to right,
-        but stitch pairs of images which have the most number of matches first
+    Not gradually stitch image_files from left to right,
+        but stitch pairs of image_files which have the most number of matches first
     Use Laplacian blender for blending
     Add reinforce rows so that no pixel of image will be lost
     Try cylindrical calibration
