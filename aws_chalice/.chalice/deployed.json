@@ -1,0 +1,11 @@
+{
+  "dev": {
+    "rest_api_id": "zhileq7qw2",
+    "chalice_version": "0.8.0",
+    "region": "ap-southeast-1",
+    "backend": "api",
+    "api_handler_name": "iot-360-camera-dev",
+    "api_handler_arn": "arn:aws:lambda:ap-southeast-1:498107424281:function:iot-360-camera-dev",
+    "api_gateway_stage": "dev"
+  }
+}
