@@ -13,7 +13,8 @@ import {
   View,
   Image,
   button,
-  Alert
+  Alert,
+  TouchableHighlight
 } from 'react-native';
 
 const timer = require('react-native-timer');
@@ -74,15 +75,19 @@ export default class Degree_360 extends Component {
                 <Text style={styles.instructions}> Refresh </Text>
                 <CheckBox style={{marginLeft : 100}}
                           label = ''
-                          checked = 'false'
                           onChange = {(checked) => this.changeState((!checked))}
                           />
             </View>
 
-            <Image style = {styles.imageStyle}
-                  source = {{uri : this.state.uri}}>
+            <TouchableHighlight
+                onPress = {reloadData}
+                style = {{flex : 1}} >
+                <Image style = {styles.imageStyle}
+                    source = {{uri : this.state.uri}}>
+                </Image>
+            </TouchableHighlight>
 
-             </Image>
+
       </View>
     );
   }
