@@ -18,15 +18,8 @@ import {
 } from 'react-native';
 
 const timer = require('react-native-timer');
-const onPress = () => {
-  timer.setInterval("count", reloadData, 5);
-};
-
-const reloadData = () => {
-  console.log("5s")
-}
-
-
+const time_reload = 4000;
+const url_link = 'http://172.17.40.212:81/english_contest2/demo_services.php'
 
 export default class Degree_360 extends Component {
   constructor(props){
@@ -36,23 +29,26 @@ export default class Degree_360 extends Component {
               }
   }
 
-  getMoviesFromApiAsync() {
-/*
-    fetch('http://localhost:3000/files')
-      .then((response) => response.json())
-      .then((responseJson) => {
-        if (this.state.checked == true) {
-          this.setState({uri: 'https://www.gravatar.com/avatar/a20ba68e4e99f17177cb1303d56036da?s=32&d=identicon&r=PG&f=1'})
-        } else {
-          this.setState({uri: 'https://www.gravatar.com/avatar/a2d818d801ce38a33807f68fdd92043a?s=64&d=identicon&r=PG'})
-        }
+  onPress = () => {
+    timer.setInterval("count", this.reloadData, 5);
+  };
 
-        console.log(responseJson[0].image)
-      })
-      .catch((error) => {
-        console.error(error);
-      }); */
-
+  reloadData = () => {
+      try {
+        fetch(url_link)
+          .then((response) => response.json()).catch( (error) => {
+            console.error(error);
+          })
+          .then((responseJson) => {
+            console.log(responseJson.url)
+              this.setState({uri: responseJson.url})
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      } catch(error) {
+          console.error(error);
+      }
   }
 
 
@@ -62,7 +58,7 @@ export default class Degree_360 extends Component {
       if (this.state.checked == false) {
           timer.clearInterval("Reload")
       } else {
-        timer.setInterval("Reload",reloadData,1000)
+        timer.setInterval("Reload",this.reloadData,time_reload)
       }
   }
 
@@ -80,7 +76,7 @@ export default class Degree_360 extends Component {
             </View>
 
             <TouchableHighlight
-                onPress = {reloadData}
+                onPress = {this.reloadData}
                 style = {{flex : 1}} >
                 <Image style = {styles.imageStyle}
                     source = {{uri : this.state.uri}}>
