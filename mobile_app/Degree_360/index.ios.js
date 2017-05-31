@@ -12,18 +12,31 @@ import {
   Text,
   View,
   Image,
-  button
+  button,
+  Alert
 } from 'react-native';
+
+const timer = require('react-native-timer');
+const onPress = () => {
+  timer.setInterval("count", reloadData, 5);
+};
+
+const reloadData = () => {
+  console.log("5s")
+}
+
+
 
 export default class Degree_360 extends Component {
   constructor(props){
     super(props);
     this.state = {uri: 'https://www.gravatar.com/avatar/a2d818d801ce38a33807f68fdd92043a?s=64&d=identicon&r=PG',
-                checked : false,
-                refreshIntervalId : setInterval(this.getMoviesFromApiAsync(), 10000)}
+                checked : false
+              }
   }
 
   getMoviesFromApiAsync() {
+/*
     fetch('http://localhost:3000/files')
       .then((response) => response.json())
       .then((responseJson) => {
@@ -37,18 +50,20 @@ export default class Degree_360 extends Component {
       })
       .catch((error) => {
         console.error(error);
-      });
+      }); */
+
   }
 
 
   changeState(checked) {
+    console.log(checked)
       this.state.checked = checked
       if (this.state.checked == false) {
-        clearTime(this.state.refreshIntervalId)
+          timer.clearInterval("Reload")
+      } else {
+        timer.setInterval("Reload",reloadData,1000)
       }
   }
-
-
 
   render() {
 
@@ -59,7 +74,8 @@ export default class Degree_360 extends Component {
                 <Text style={styles.instructions}> Refresh </Text>
                 <CheckBox style={{marginLeft : 100}}
                           label = ''
-                          onChange = {(checked) => this.changeState((checked))}
+                          checked = 'false'
+                          onChange = {(checked) => this.changeState((!checked))}
                           />
             </View>
 
@@ -68,11 +84,6 @@ export default class Degree_360 extends Component {
 
              </Image>
       </View>
-        // <Image
-        //     source = {{uri : 'https://www.gravatar.com/avatar/a2d818d801ce38a33807f68fdd92043a?s=64&d=identicon&r=PG'}}
-        //     style = {styles.imageStyle}
-        //   />
-
     );
   }
 }
