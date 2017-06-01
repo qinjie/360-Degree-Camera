@@ -23,13 +23,29 @@ class ApiHelper:
             print e
             raise e
 
+    def downloadImageBase64(self, file_path, url=URL):
+        try:
+            r = requests.get(url)
+            if r.status_code == 200:
+                json = r.json()
+                data = base64.b64decode(json['body'])
+                with open(file_path, 'wb') as f:
+                    f.write(data)
+                return True
+            else:
+                return False
+        except Exception as e:
+            print e
+            raise e
+
 
 if __name__ == '__main__':
-    file_name = 'google.jpg'
+    file_name = 'download.jpg'
     _path_cur_dir = os.path.dirname(os.path.realpath(__file__))
     file_path = os.path.join(_path_cur_dir, file_name)
     api = ApiHelper()
     try:
-        api.uploadImageBase64(file_path)
+        # api.uploadImageBase64(file_path)
+        print api.downloadImageBase64(file_path)
     except Exception as e:
         print e.message
