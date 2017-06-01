@@ -14,18 +14,19 @@ import {
   Image,
   button,
   Alert,
-  TouchableHighlight
+  TouchableHighlight,
+  AsyncStorage
 } from 'react-native';
 
 const timer = require('react-native-timer');
 const time_reload = 4000;
-const url_link = 'http://172.17.40.212:81/english_contest2/demo_services.php'
-
+var url_link = 'https://zhileq7qw2.execute-api.ap-southeast-1.amazonaws.com/dev/base64_object/iot-360-camera/camera01.jpg'
 export default class Degree_360 extends Component {
   constructor(props){
     super(props);
-    this.state = {uri: 'https://www.gravatar.com/avatar/a2d818d801ce38a33807f68fdd92043a?s=64&d=identicon&r=PG',
-                checked : false
+    this.state = {base64Data: 'data:image/png;base64,',
+                checked : false,
+                timestamp: -1
               }
   }
 
@@ -35,18 +36,39 @@ export default class Degree_360 extends Component {
 
   reloadData = () => {
       try {
+        var timestamp =  AsyncStorage.getItem("timestamp")
+        console.log(timestamp);
+        if (!isNaN(timestamp)) {
+          console.log('Not nil')
+          url_link = url_link + '?timestamp=' + timestamp
+        } else {
+
+        }
+        console.log(url_link)
+
         fetch(url_link)
           .then((response) => response.json()).catch( (error) => {
             console.error(error);
           })
           .then((responseJson) => {
-            console.log(responseJson.url)
-              this.setState({uri: responseJson.url})
+            if (responseJson.body === undefined) {
+
+            } else
+            {
+              console.log(responseJson.body)
+                this.setState({base64Data: this.state.base64Data + responseJson.body})
+                let timestamp = responseJson.timestamp
+                AsyncStorage.setItem("timestamp", timestamp.toString())
+                this.state.timestamp = timestamp
+            }
           })
           .catch((error) => {
+            timer.clearInterval("Reload")
             console.error(error);
           });
+
       } catch(error) {
+        timer.clearInterval("Reload")
           console.error(error);
       }
   }
@@ -63,11 +85,14 @@ export default class Degree_360 extends Component {
   }
 
   render() {
-
+    this.reloadData()
     return (
-      <View style={styles.container}>
+      <View style={styles.containe}>
+            <View style = {{marginTop: 20, backgroundColor: '#FAFAFA', height: 44, alignItems: 'center'}}>
+                <Text style = {styles.title}> 360 Degree </Text>
+            </View>
             <View style={{flexDirection : 'row', alignItems: 'center', justifyContent: 'center',
-          backgroundColor: '#ffffff'}}>
+          backgroundColor: '#ffffff', marginTop: 15}}>
                 <Text style={styles.instructions}> Refresh </Text>
                 <CheckBox style={{marginLeft : 100}}
                           label = ''
@@ -77,9 +102,11 @@ export default class Degree_360 extends Component {
 
             <TouchableHighlight
                 onPress = {this.reloadData}
-                style = {{flex : 1}} >
+                style = {{flex : 1}}
+
+                >
                 <Image style = {styles.imageStyle}
-                    source = {{uri : this.state.uri}}>
+                    source = {{uri : this.state.base64Data}}>
                 </Image>
             </TouchableHighlight>
 
@@ -102,11 +129,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     margin: 10,
   },
+  title: {
+    textAlign: 'center',
+    alignItems: 'center',
+    fontSize: 25
+  },
   instructions: {
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
-    fontSize: 30,
+    fontSize: 20,
     marginRight : 10
   },
   imageStyle: {
