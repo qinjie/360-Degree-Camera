@@ -4,6 +4,7 @@ from datetime import datetime
 
 
 class DatetimeEncoder(json.JSONEncoder):
+
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.strftime('%Y-%m-%dT%H:%M:%SZ')

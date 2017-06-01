@@ -5,6 +5,7 @@ import shutil
 import uuid
 
 import boto3
+import time
 from chalice import Chalice, NotFoundError, Response, BadRequestError
 from chalice import Response
 
@@ -20,6 +21,7 @@ s3_res = boto3.resource('s3', region_name=REGION)
 
 
 # ToDo
+# http://chalice.readthedocs.io/en/latest/quickstart.html#tutorial-customizing-the-http-response
 @app.route('/binary_object/{bucket}/{key}', methods=['GET', 'PUT'])
 def binary_object(bucket, key):
     request = app.current_request
@@ -82,8 +84,19 @@ def base64_object(bucket, key):
         try:
             bucket = s3_res.Bucket(bucket)
             obj = bucket.Object(key)
-            body = base64.b64encode(obj.get()['Body'].read())
-            response = Response(body=body, headers={'Content-Transfer-Encoding': 'base64', 'Content-Type': 'image'})
+            try:
+                timestamp = time.mktime(obj.last_modified.timetuple())
+            except Exception as e:
+                print e
+                raise NotFoundError("No file found with key = {}".format(key))
+
+            if request.query_params and request.query_params.get('timestamp'):
+                earliest = request.query_params.get('timestamp')
+                if timestamp <= int(earliest):
+                    raise NotFoundError("No new file version available")
+
+            body = {'timestamp': timestamp, 'body': base64.b64encode(obj.get()['Body'].read()), 'encode': 'base64'}
+            response = json.dumps(body)
             return response
         except Exception as e:
             print e
