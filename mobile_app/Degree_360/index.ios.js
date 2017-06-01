@@ -85,9 +85,8 @@ export default class Degree_360 extends Component {
   }
 
   render() {
-    this.reloadData()
     return (
-      <View style={styles.containe}>
+      <View style={styles.container}>
             <View style = {{marginTop: 20, backgroundColor: '#FAFAFA', height: 44, alignItems: 'center'}}>
                 <Text style = {styles.title}> 360 Degree </Text>
             </View>
@@ -96,21 +95,16 @@ export default class Degree_360 extends Component {
                 <Text style={styles.instructions}> Refresh </Text>
                 <CheckBox style={{marginLeft : 100}}
                           label = ''
-                          onChange = {(checked) => this.changeState((!checked))}
-                          />
+                          onChange = {(checked) => this.changeState((!checked))}/>
             </View>
-
             <TouchableHighlight
                 onPress = {this.reloadData}
                 style = {{flex : 1}}
-
                 >
                 <Image style = {styles.imageStyle}
                     source = {{uri : this.state.base64Data}}>
                 </Image>
             </TouchableHighlight>
-
-
       </View>
     );
   }
