@@ -15,11 +15,12 @@ import {
   button,
   Alert,
   TouchableHighlight,
-  AsyncStorage
+  AsyncStorage,
+  AppState
 } from 'react-native';
 
 const timer = require('react-native-timer');
-const time_reload = 4000;
+const time_reload = 1000;
 var url_link = 'https://zhileq7qw2.execute-api.ap-southeast-1.amazonaws.com/dev/base64_object/iot-360-camera/camera01.jpg'
 export default class Degree_360 extends Component {
   constructor(props){
@@ -34,10 +35,10 @@ export default class Degree_360 extends Component {
     timer.setInterval("count", this.reloadData, 5);
   };
 
-  reloadData = () => {
+  async reloadData() {
       try {
-        var timestamp =  AsyncStorage.getItem("timestamp")
-        console.log(timestamp);
+        var timestamp =  await AsyncStorage.getItem('@MySuperStore:key')
+        console.log('timestamp', timestamp.toString());
         if (!isNaN(timestamp)) {
           console.log('Not nil')
           url_link = url_link + '?timestamp=' + timestamp
@@ -50,15 +51,15 @@ export default class Degree_360 extends Component {
           .then((response) => response.json()).catch( (error) => {
             console.error(error);
           })
-          .then((responseJson) => {
+          .then(async (responseJson) => {
             if (responseJson.body === undefined) {
 
             } else
             {
-              console.log(responseJson.body)
                 this.setState({base64Data: this.state.base64Data + responseJson.body})
                 let timestamp = responseJson.timestamp
-                AsyncStorage.setItem("timestamp", timestamp.toString())
+                //console.log(timestamp.toString())
+                await AsyncStorage.setItem('@MySuperStore:key', timestamp.toString())
                 this.state.timestamp = timestamp
             }
           })
@@ -71,6 +72,10 @@ export default class Degree_360 extends Component {
         timer.clearInterval("Reload")
           console.error(error);
       }
+  }
+
+  componentDidMount() {
+    this.reloadData()
   }
 
 
