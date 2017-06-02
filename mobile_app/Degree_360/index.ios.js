@@ -16,51 +16,156 @@ import {
   Alert,
   TouchableHighlight,
   AsyncStorage,
-  AppState
+  AppState,
+  NavigatorIOS
 } from 'react-native';
 
 const timer = require('react-native-timer');
-const time_reload = 1000;
-var url_link = 'https://zhileq7qw2.execute-api.ap-southeast-1.amazonaws.com/dev/base64_object/iot-360-camera/camera01.jpg'
-export default class Degree_360 extends Component {
+const time_reload = 500;
+var base_link = 'https://zhileq7qw2.execute-api.ap-southeast-1.amazonaws.com/dev/base64_object/iot-360-camera/camera01.png'
+var url_link = 'https://zhileq7qw2.execute-api.ap-southeast-1.amazonaws.com/dev/base64_object/iot-360-camera/camera01.png'
+export  class Degree_360 extends Component {
   constructor(props){
     super(props);
     this.state = {base64Data: 'data:image/png;base64,',
                 checked : false,
-                timestamp: -1
+                timestamp: '0',
+                timestapRequest: '0',
+                time: ''
               }
+    this.reloadData = this.reloadData.bind(this)
   }
 
   onPress = () => {
     timer.setInterval("count", this.reloadData, 5);
   };
 
+  async initViewController() {
+    try {
+      var timestamp =  await AsyncStorage.getItem('@MySuperStore:key')
+      if (timestamp !== '0') {
+          if (!isNaN(timestamp)) {
+            url_link = base_link + '?timestamp=' + timestamp
+          } else {
+
+          }
+      }
+
+
+      let _this = this
+      fetch(url_link)
+        .then((response) => response.json()).catch( (error) => {
+          console.error(error);
+        })
+        .then(async (responseJson) => {
+          if (typeof(responseJson.body) === 'undefined') {
+
+          } else
+          {
+            if (typeof(responseJson.body) != 'undefined') {
+              if ( this.state.timestamp == responseJson.timestamp) {
+
+              } else {
+                _this.setState({base64Data: 'data:image/png;base64,' + responseJson.body})
+                _this.setState({timestapRequest: responseJson.timestamp})
+                let timestamp1 = new Date( responseJson.timestamp * 1000)
+                let dateValues = [
+                  timestamp1.getFullYear(),
+                  timestamp1.getMonth()+1,
+                  timestamp1.getDate(),
+                  timestamp1.getHours(),
+                  timestamp1.getMinutes(),
+                  timestamp1.getSeconds(),
+                ]
+
+                dateValues[1] = (dateValues[1] < 10 ? '0' : '') + dateValues[1]
+                dateValues[2] = (dateValues[2] < 10 ? '0' : '') + dateValues[2]
+                dateValues[3] = (dateValues[3] < 10 ? '0' : '') + dateValues[3]
+                dateValues[4] = (dateValues[4] < 10 ? '0' : '') + dateValues[4]
+                dateValues[5] = (dateValues[5] < 10 ? '0' : '') + dateValues[5]
+
+                let timeConvert = dateValues[0] + '-' +  dateValues[1] + '-' +  dateValues[2]+
+                '   ' +  dateValues[3]+ ':' + dateValues[4] + ':' + dateValues[5]
+
+                _this.setState({time: timeConvert})
+
+                //console.log(timestamp.toString())
+
+                await AsyncStorage.setItem('@MySuperStore:key', timestamp.toString())
+                this.state.timestamp = timestamp
+              }
+            }
+
+          }
+        })
+        .catch((error) => {
+          timer.clearInterval("Reload")
+          console.error(error);
+        });
+
+    } catch(error) {
+      timer.clearInterval("Reload")
+        console.error(error);
+    }
+  }
+
   async reloadData() {
       try {
-        var timestamp =  await AsyncStorage.getItem('@MySuperStore:key')
-        console.log('timestamp', timestamp.toString());
-        if (!isNaN(timestamp)) {
-          console.log('Not nil')
-          url_link = url_link + '?timestamp=' + timestamp
-        } else {
+        var timestamp =  this.state.timestapRequest
 
+        if (timestamp !== '0') {
+            if (!isNaN(timestamp)) {
+              url_link = base_link + '?timestamp=' + timestamp
+            } else {
+
+            }
         }
-        console.log(url_link)
 
+        let _this = this
+        console.log(url_link)
         fetch(url_link)
           .then((response) => response.json()).catch( (error) => {
             console.error(error);
           })
           .then(async (responseJson) => {
-            if (responseJson.body === undefined) {
+            if (typeof(responseJson.body) === 'undefined') {
 
             } else
             {
-                this.setState({base64Data: this.state.base64Data + responseJson.body})
-                let timestamp = responseJson.timestamp
-                //console.log(timestamp.toString())
-                await AsyncStorage.setItem('@MySuperStore:key', timestamp.toString())
-                this.state.timestamp = timestamp
+
+              if (typeof(responseJson.body) != 'undefined') {
+
+                  console.log('Change Time' , this.state.timestapRequest ,'    ',  responseJson.timestamp)
+                  _this.setState({base64Data: 'data:image/png;base64,' + responseJson.body})
+                  _this.setState({timestapRequest: responseJson.timestamp})
+                  let timestamp1 = new Date( responseJson.timestamp * 1000)
+                  let dateValues = [
+                    timestamp1.getFullYear(),
+                    timestamp1.getMonth()+1,
+                    timestamp1.getDate(),
+                    timestamp1.getHours(),
+                    timestamp1.getMinutes(),
+                    timestamp1.getSeconds(),
+                  ]
+
+                  dateValues[1] = (dateValues[1] < 10 ? '0' : '') + dateValues[1]
+                  dateValues[2] = (dateValues[2] < 10 ? '0' : '') + dateValues[2]
+                  dateValues[3] = (dateValues[3] < 10 ? '0' : '') + dateValues[3]
+                  dateValues[4] = (dateValues[4] < 10 ? '0' : '') + dateValues[4]
+                  dateValues[5] = (dateValues[5] < 10 ? '0' : '') + dateValues[5]
+
+                  let timeConvert = dateValues[0] + '-' +  dateValues[1] + '-' +  dateValues[2]+
+                  '   ' +  dateValues[3]+ ':' + dateValues[4] + ':' + dateValues[5]
+
+                  _this.setState({time: timeConvert})
+
+                  //console.log(timestamp.toString())
+
+                  await AsyncStorage.setItem('@MySuperStore:key', timestamp.toString())
+                  this.state.timestamp = timestamp
+
+              }
+
             }
           })
           .catch((error) => {
@@ -75,12 +180,10 @@ export default class Degree_360 extends Component {
   }
 
   componentDidMount() {
-    this.reloadData()
+    this.initViewController()
   }
-
-
   changeState(checked) {
-    console.log(checked)
+
       this.state.checked = checked
       if (this.state.checked == false) {
           timer.clearInterval("Reload")
@@ -92,7 +195,9 @@ export default class Degree_360 extends Component {
   render() {
     return (
       <View style={styles.container}>
-            <View style = {{marginTop: 20, backgroundColor: '#FAFAFA', height: 44, alignItems: 'center'}}>
+            <View style = {{marginTop: 0, backgroundColor: '#2196F3', height: 20}}>
+            </View>
+            <View style = {{marginTop: 0, backgroundColor: '#2196F3', height: 44, alignItems: 'center', justifyContent: 'center'}}>
                 <Text style = {styles.title}> 360 Degree </Text>
             </View>
             <View style={{flexDirection : 'row', alignItems: 'center', justifyContent: 'center',
@@ -102,14 +207,25 @@ export default class Degree_360 extends Component {
                           label = ''
                           onChange = {(checked) => this.changeState((!checked))}/>
             </View>
-            <TouchableHighlight
-                onPress = {this.reloadData}
+            <View
                 style = {{flex : 1}}
                 >
-                <Image style = {styles.imageStyle}
-                    source = {{uri : this.state.base64Data}}>
-                </Image>
-            </TouchableHighlight>
+                <Text style = {{marginTop: 10, marginBottom: 10, justifyContent : 'center' , alignItems: 'center',
+              textAlign: 'center' , fontWeight: '500'}}>
+                      {this.state.time}
+              </Text>
+                <TouchableHighlight
+                    underlayColor = '#FAFAFA'
+                    onPress = {this.reloadData}
+                    style = {{flex : 1}}
+
+                    >
+                    <Image style = {styles.imageStyle}
+                        source = {{uri : this.state.base64Data}}>
+                    </Image>
+                </TouchableHighlight>
+            </View>
+
       </View>
     );
   }
@@ -117,11 +233,13 @@ export default class Degree_360 extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 64,
     flex: 1,
+    marginBottom: 10,
+    backgroundColor: '#FAFAFA'
     // justifyContent: 'center',
     // alignItems: 'center',
-    marginBottom: 10
+
+
   },
   welcome: {
     fontSize: 20,
@@ -131,7 +249,10 @@ const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
     alignItems: 'center',
-    fontSize: 25
+    fontSize: 25,
+    fontWeight: 'bold',
+    justifyContent: 'center',
+    color: '#ffffff'
   },
   instructions: {
     textAlign: 'center',
@@ -146,5 +267,19 @@ const styles = StyleSheet.create({
     resizeMode : 'contain'
   }
 });
+
+export class DegreeApp extends Component {
+  render() {
+    return (
+      <NavigatorIOS
+        initialRoute={{
+          component: Degree_360,
+          title: 'My Initial Scene',
+        }}
+        style={{flex: 1}}
+      />
+    );
+  }
+}
 
 AppRegistry.registerComponent('Degree_360', () => Degree_360);
