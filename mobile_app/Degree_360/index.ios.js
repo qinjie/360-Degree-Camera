@@ -17,7 +17,8 @@ import {
   TouchableHighlight,
   AsyncStorage,
   AppState,
-  NavigatorIOS
+  NavigatorIOS,
+  NetInfo
 } from 'react-native';
 
 const timer = require('react-native-timer');
@@ -43,61 +44,72 @@ export  class Degree_360 extends Component {
   async initViewController() {
     try {
       var timestamp =  await AsyncStorage.getItem('@MySuperStore:key')
-      if (timestamp !== '0') {
-          if (!isNaN(timestamp)) {
-            url_link = base_link + '?timestamp=' + timestamp
-          } else {
+      if (timestamp != null) {
+        if (timestamp !== '0') {
+            if (!isNaN(timestamp)) {
+              url_link = base_link + '?timestamp=' + timestamp
+            } else {
 
-          }
+            }
+        }
       }
 
+      console.log(url_link)
 
       let _this = this
       fetch(url_link)
-        .then((response) => response.json()).catch( (error) => {
+        .then((response) => response.json(),
+            (error) => console.log(error)).catch( (error) => {
           console.error(error);
         })
         .then(async (responseJson) => {
-          if (typeof(responseJson.body) === 'undefined') {
+            console.log('CheckType1',responseJson.body)
+            console.log('CheckType2',typeof (responseJson.body))
+            if (responseJson !== undefined) {
+                if (typeof(responseJson.body) !== 'undefined') {
+                    if (typeof(responseJson.body) !== 'undefined') {
+                        if ( this.state.timestamp == responseJson.timestamp) {
 
-          } else
-          {
-            if (typeof(responseJson.body) != 'undefined') {
-              if ( this.state.timestamp == responseJson.timestamp) {
+                        } else {
+                            _this.setState({base64Data: 'data:image/png;base64,' + responseJson.body})
+                            _this.setState({timestapRequest: responseJson.timestamp})
+                            let timestamp2 = responseJson.timestamp
+                            let timestamp1 = new Date( responseJson.timestamp * 1000)
+                            let dateValues = [
+                                timestamp1.getFullYear(),
+                                timestamp1.getMonth()+1,
+                                timestamp1.getDate(),
+                                timestamp1.getHours(),
+                                timestamp1.getMinutes(),
+                                timestamp1.getSeconds(),
+                            ]
 
-              } else {
-                _this.setState({base64Data: 'data:image/png;base64,' + responseJson.body})
-                _this.setState({timestapRequest: responseJson.timestamp})
-                let timestamp1 = new Date( responseJson.timestamp * 1000)
-                let dateValues = [
-                  timestamp1.getFullYear(),
-                  timestamp1.getMonth()+1,
-                  timestamp1.getDate(),
-                  timestamp1.getHours(),
-                  timestamp1.getMinutes(),
-                  timestamp1.getSeconds(),
-                ]
+                            dateValues[1] = (dateValues[1] < 10 ? '0' : '') + dateValues[1]
+                            dateValues[2] = (dateValues[2] < 10 ? '0' : '') + dateValues[2]
+                            dateValues[3] = (dateValues[3] < 10 ? '0' : '') + dateValues[3]
+                            dateValues[4] = (dateValues[4] < 10 ? '0' : '') + dateValues[4]
+                            dateValues[5] = (dateValues[5] < 10 ? '0' : '') + dateValues[5]
 
-                dateValues[1] = (dateValues[1] < 10 ? '0' : '') + dateValues[1]
-                dateValues[2] = (dateValues[2] < 10 ? '0' : '') + dateValues[2]
-                dateValues[3] = (dateValues[3] < 10 ? '0' : '') + dateValues[3]
-                dateValues[4] = (dateValues[4] < 10 ? '0' : '') + dateValues[4]
-                dateValues[5] = (dateValues[5] < 10 ? '0' : '') + dateValues[5]
+                            let timeConvert = dateValues[0] + '-' +  dateValues[1] + '-' +  dateValues[2]+
+                                '   ' +  dateValues[3]+ ':' + dateValues[4] + ':' + dateValues[5]
 
-                let timeConvert = dateValues[0] + '-' +  dateValues[1] + '-' +  dateValues[2]+
-                '   ' +  dateValues[3]+ ':' + dateValues[4] + ':' + dateValues[5]
+                            _this.setState({time: timeConvert})
 
-                _this.setState({time: timeConvert})
+                            //console.log(timestamp.toString())
 
-                //console.log(timestamp.toString())
+                            await AsyncStorage.setItem('@MySuperStore:key', timestamp2.toString())
+                            this.state.timestamp = timestamp2
+                        }
+                    }
+                } else
+                {
 
-                await AsyncStorage.setItem('@MySuperStore:key', timestamp.toString())
-                this.state.timestamp = timestamp
-              }
+
+                }
             }
 
-          }
-        })
+        },
+            (error) => console.log(error))
         .catch((error) => {
           timer.clearInterval("Reload")
           console.error(error);
@@ -124,57 +136,57 @@ export  class Degree_360 extends Component {
         let _this = this
 
         fetch(url_link)
-          .then((response) => response.json()).catch( (error) => {
-            console.error(error);
-          })
+          .then((response) => response.json(),
+              (error) => console.log(error))
           .then(async (responseJson) => {
-            if (typeof(responseJson.body) === 'undefined') {
-              console.log(' No Data' , responseJson.body, ' ' , responseJson.Message)
-            } else
-            {
+              if (responseJson !== undefined) {
+                  if (typeof(responseJson.body) !== 'undefined') {
+                      console('CheckType3')
+                      console.log(' No Data' , responseJson.body, ' ' , responseJson.Message)
+                      if (typeof(responseJson.body) != 'undefined') {
+                          console.log('No Message',responseJson.Message)
+                          let newData = 'data:image/png;base64,' + responseJson.body
+                          if (newData == this.state.base64Data) {
 
-              if (typeof(responseJson.body) != 'undefined') {
-                  console.log('No Message',responseJson.Message)
-                  let newData = 'data:image/png;base64,' + responseJson.body
-                  if (newData == this.state.base64Data) {
+                          } else {
+                              console.log('Change Image')
+                              _this.setState({base64Data: 'data:image/png;base64,' + responseJson.body})
 
-                  } else {
-                    console.log('Change Image')
-                    _this.setState({base64Data: 'data:image/png;base64,' + responseJson.body})
+                              _this.setState({timestapRequest: responseJson.timestamp})
+                              let timestamp2 = responseJson.timestamp
+                              let timestamp1 = new Date( responseJson.timestamp * 1000)
+                              let dateValues = [
+                                  timestamp1.getFullYear(),
+                                  timestamp1.getMonth()+1,
+                                  timestamp1.getDate(),
+                                  timestamp1.getHours(),
+                                  timestamp1.getMinutes(),
+                                  timestamp1.getSeconds(),
+                              ]
 
-                                      _this.setState({timestapRequest: responseJson.timestamp})
-                                      let timestamp1 = new Date( responseJson.timestamp * 1000)
-                                      let dateValues = [
-                                        timestamp1.getFullYear(),
-                                        timestamp1.getMonth()+1,
-                                        timestamp1.getDate(),
-                                        timestamp1.getHours(),
-                                        timestamp1.getMinutes(),
-                                        timestamp1.getSeconds(),
-                                      ]
+                              dateValues[1] = (dateValues[1] < 10 ? '0' : '') + dateValues[1]
+                              dateValues[2] = (dateValues[2] < 10 ? '0' : '') + dateValues[2]
+                              dateValues[3] = (dateValues[3] < 10 ? '0' : '') + dateValues[3]
+                              dateValues[4] = (dateValues[4] < 10 ? '0' : '') + dateValues[4]
+                              dateValues[5] = (dateValues[5] < 10 ? '0' : '') + dateValues[5]
 
-                                      dateValues[1] = (dateValues[1] < 10 ? '0' : '') + dateValues[1]
-                                      dateValues[2] = (dateValues[2] < 10 ? '0' : '') + dateValues[2]
-                                      dateValues[3] = (dateValues[3] < 10 ? '0' : '') + dateValues[3]
-                                      dateValues[4] = (dateValues[4] < 10 ? '0' : '') + dateValues[4]
-                                      dateValues[5] = (dateValues[5] < 10 ? '0' : '') + dateValues[5]
+                              let timeConvert = dateValues[0] + '-' +  dateValues[1] + '-' +  dateValues[2]+
+                                  '   ' +  dateValues[3]+ ':' + dateValues[4] + ':' + dateValues[5]
 
-                                      let timeConvert = dateValues[0] + '-' +  dateValues[1] + '-' +  dateValues[2]+
-                                      '   ' +  dateValues[3]+ ':' + dateValues[4] + ':' + dateValues[5]
+                              _this.setState({time: timeConvert})
 
-                                      _this.setState({time: timeConvert})
+                              //console.log(timestamp.toString())
 
-                                      //console.log(timestamp.toString())
+                              await AsyncStorage.setItem('@MySuperStore:key', timestamp2.toString())
+                              this.state.timestamp = timestamp2
 
-                                      await AsyncStorage.setItem('@MySuperStore:key', timestamp.toString())
-                                      this.state.timestamp = timestamp
+                          }
 
+                      }
                   }
-
               }
 
-            }
-          })
+          }, (error) => console.log(error))
           .catch((error) => {
             timer.clearInterval("Reload")
             console.error(error);
@@ -186,9 +198,7 @@ export  class Degree_360 extends Component {
       }
   }
 
-  componentDidMount() {
-    this.initViewController()
-  }
+
   changeState(checked) {
 
       this.state.checked = checked
