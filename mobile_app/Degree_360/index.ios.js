@@ -34,6 +34,7 @@ export  class Degree_360 extends Component {
                 timestapRequest: '0',
                 time: ''
               }
+              this.initViewController()
     this.reloadData = this.reloadData.bind(this)
   }
 
@@ -63,9 +64,8 @@ export  class Degree_360 extends Component {
           console.error(error);
         })
         .then(async (responseJson) => {
-            console.log('CheckType1',responseJson.body)
-            console.log('CheckType2',typeof (responseJson.body))
             if (responseJson !== undefined) {
+                console.log('Just Test', responseJson)
                 if (typeof(responseJson.body) !== 'undefined') {
                     if (typeof(responseJson.body) !== 'undefined') {
                         if ( this.state.timestamp == responseJson.timestamp) {
@@ -141,7 +141,6 @@ export  class Degree_360 extends Component {
           .then(async (responseJson) => {
               if (responseJson !== undefined) {
                   if (typeof(responseJson.body) !== 'undefined') {
-                      console('CheckType3')
                       console.log(' No Data' , responseJson.body, ' ' , responseJson.Message)
                       if (typeof(responseJson.body) != 'undefined') {
                           console.log('No Message',responseJson.Message)
