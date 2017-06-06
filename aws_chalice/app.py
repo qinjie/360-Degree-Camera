@@ -7,9 +7,14 @@ import uuid
 import boto3
 import time
 
+import cv2
+import numpy
 from chalice import Chalice, NotFoundError, Response, BadRequestError
 from chalice import Response
 from datetime import datetime
+
+from chalicelib.panorama.panorama import Stitcher
+from chalicelib.panorama.utilsImage import load_image
 
 app = Chalice(app_name='iot-360-camera')
 
@@ -119,67 +124,67 @@ def base64_object(bucket, key):
             print e
             raise e
 
-# @app.route('/cv2_version/{bucket}', methods=['GET'])
-# def cv2_version():
-#     cv_version = cv2.__version__
-#     numpy_version = numpy.__version__
-#     return {'cv2': cv_version, 'numpy': numpy_version}
-#
-#
-# @app.route('/stitch_images/{bucket}', methods=['POST'])
-# def stitch_images(bucket):
-#     request = app.current_request
-#     try:
-#         json = request.json_body
-#     except Exception as e:
-#         raise BadRequestError("Invalid JSON data: {}".format(e.message))
-#     if 'output_key' not in json:
-#         raise BadRequestError('Missing output_key value.')
-#     if 'input_keys' not in json:
-#         raise BadRequestError('Missing input_keys value')
-#     output_key = json['output_key']
-#     output_path = '/tmp/{}'.format(output_key)
-#     input_keys = json['input_keys']
-#     if len(input_keys) < 2:
-#         raise BadRequestError('More than 1 image is needed to perform stiching.')
-#
-#     '''Download images from S3'''
-#     input_paths = {}
-#     for k, input_key in input_keys.iteritems():
-#         file_path = '/tmp/{}'.format(input_key)
-#         print input_key, file_path
-#         input_paths[k] = file_path
-#         s3_client.download_file(bucket, input_key, file_path)
-#
-#     '''Timing'''
-#     begin_time = datetime.datetime.now()
-#
-#     '''Load the to-be-stitched image_files beforehand'''
-#     images = []
-#     for key in sorted(input_paths):
-#         print key, input_paths[key]
-#         images.append(load_image(input_paths[key]))
-#
-#     '''stitch the first 2 image_files
-#     because this is the first 2 image_files to be stitched, set firstTime=True
-#     kps contains the position of the keypoints
-#     features contains the descriptors of the corresponding keypoints
-#     deg is the degree the right image had been bent'''
-#     stitcher = Stitcher()
-#     result, kps, features, deg = stitcher.stitch([images[0], images[1]], firstTime=True)
-#
-#     '''Continuously stitch the result with the other image_files,
-#     each time, an image is stitched to the right of the previous-result image'''
-#     for idx in range(2, len(images)):
-#         stitcher = Stitcher()
-#     result, kps, features, deg = stitcher.stitch([result, images[idx]],
-#                                                  firstTime=False, l_ori_kps=kps,
-#                                                  l_features=features, l_deg=deg)
-#
-#     print 'Elapsed time:', datetime.datetime.now() - begin_time
-#
-#     '''Show and save the result'''
-#     cv2.imwrite(output_path, result)
-#     s3_client.upload_file(output_path, bucket, output_key)
-#
-#     return output_path
+@app.route('/cv2_version/{bucket}', methods=['GET'])
+def cv2_version():
+    cv_version = cv2.__version__
+    numpy_version = numpy.__version__
+    return {'cv2': cv_version, 'numpy': numpy_version}
+
+
+@app.route('/stitch_images/{bucket}', methods=['POST'])
+def stitch_images(bucket):
+    request = app.current_request
+    try:
+        json = request.json_body
+    except Exception as e:
+        raise BadRequestError("Invalid JSON data: {}".format(e.message))
+    if 'output_key' not in json:
+        raise BadRequestError('Missing output_key value.')
+    if 'input_keys' not in json:
+        raise BadRequestError('Missing input_keys value')
+    output_key = json['output_key']
+    output_path = '/tmp/{}'.format(output_key)
+    input_keys = json['input_keys']
+    if len(input_keys) < 2:
+        raise BadRequestError('More than 1 image is needed to perform stiching.')
+
+    '''Download images from S3'''
+    input_paths = {}
+    for k, input_key in input_keys.iteritems():
+        file_path = '/tmp/{}'.format(input_key)
+        print input_key, file_path
+        input_paths[k] = file_path
+        s3_client.download_file(bucket, input_key, file_path)
+
+    '''Timing'''
+    begin_time = datetime.datetime.now()
+
+    '''Load the to-be-stitched image_files beforehand'''
+    images = []
+    for key in sorted(input_paths):
+        print key, input_paths[key]
+        images.append(load_image(input_paths[key]))
+
+    '''stitch the first 2 image_files
+    because this is the first 2 image_files to be stitched, set firstTime=True
+    kps contains the position of the keypoints
+    features contains the descriptors of the corresponding keypoints
+    deg is the degree the right image had been bent'''
+    stitcher = Stitcher()
+    result, kps, features, deg = stitcher.stitch([images[0], images[1]], firstTime=True)
+
+    '''Continuously stitch the result with the other image_files,
+    each time, an image is stitched to the right of the previous-result image'''
+    for idx in range(2, len(images)):
+        stitcher = Stitcher()
+    result, kps, features, deg = stitcher.stitch([result, images[idx]],
+                                                 firstTime=False, l_ori_kps=kps,
+                                                 l_features=features, l_deg=deg)
+
+    print 'Elapsed time:', datetime.datetime.now() - begin_time
+
+    '''Show and save the result'''
+    cv2.imwrite(output_path, result)
+    s3_client.upload_file(output_path, bucket, output_key)
+
+    return output_path
