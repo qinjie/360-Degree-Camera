@@ -1,0 +1,23 @@
+{
+  "version": "2.0",
+  "app_name": "iot-360-degree-camera",
+  "environment_variables": {
+    "S3_BUCKET": "iot-centre-projects",
+    "SQS_QUEUE": "iot-centre-projects"
+  },
+  "tags": {
+    "project": "360-degree-camera"
+  },
+  "lambda_timeout": 30,
+  "lambda_memory_size": 128,
+  "stages": {
+    "dev": {
+      "autogen_policy": false,
+      "api_gateway_stage": "dev",
+      "environment_variables": {
+        "SHARED_CONFIG": "foo",
+        "OTHER_CONFIG": "from-top"
+      }
+    }
+  }
+}
