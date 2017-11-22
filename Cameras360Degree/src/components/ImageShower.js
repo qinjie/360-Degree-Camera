@@ -54,12 +54,12 @@ export default class ImageShower extends Component {
 	render() {
 		return (
 			<Card>
-				<Text>Camera : {this.props.camera_name}</Text>
+				<Text noted>Camera : {this.props.camera_name}</Text>
 				<CardItem>
 					<Button dark bordered
 						onPress={() => { Actions.ShowImagePage({camera_name: this.props.camera_name, key_name: this.props.key_name, base_url: this.props.base_url, base64Data: this.state.base64Data}); }}>
 						<Image
-							style={{ width: 400, height: 100 }}
+							style={{ width: 340, height: 70 }}
 							source={{ uri: this.state.base64Data }}
 						/>
 					</Button>

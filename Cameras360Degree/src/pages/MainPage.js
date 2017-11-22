@@ -17,10 +17,6 @@ export default class MainPage extends Component {
     this.key_prefix = "360-degree-camera/";
   }
 
-  componentWillMount() {
-    this.props.base_url = "https://jyf7s0ji3m.execute-api.ap-southeast-1.amazonaws.com/dev/s3_signed_url/download";
-    this.props.key_prefix = "360-degree-camera/";
-  }
 
   componentDidMount() {
     this.init_list_camera();

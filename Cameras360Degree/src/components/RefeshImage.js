@@ -11,16 +11,34 @@ export default class RefeshImage extends Component {
 			status: false,
 			base64Data: this.props.base64Data
 		}
+		this.key_name = this.props.key_name;
+		this.base_url = this.props.base_url;
+		this.camare_name = this.props.camera_name;
+		this.fetchImage = this.fetchImage.bind(this);
+		//alert("MrDat" + this.props.key_name + " " + this.props.camera_name + " " + this.props.base_url);
 		//keyname base_url
 	}
 
-	componentWillMount() {
+	componentDidMount() {
 		//this.fetchImage();
+		this.createTimer();
+	}
+
+	createTimer() {
+		this.clearTimer();
+		//alert("Created Timer");
+		this.refesh = setInterval(this.fetchImage, 10000);
+	}
+
+	clearTimer() {
+		//alert("Clear Timer");
+		clearInterval(this.refresh);
 	}
 
 	fetchImage() {
-		var key_name = this.props.key_name;
-		var base_url = this.props.base_url;
+		//alert("MrDat" + this.key_name + " " + this.camera_name + " " + this.base_url);
+		var key_name = this.key_name;
+		var base_url = this.base_url;
 		fetch(base_url, {
 			method: 'POST',
 			headers: {
@@ -52,30 +70,21 @@ export default class RefeshImage extends Component {
 
 	render() {
 		return (
-			// <Image
-			// 	style={{ width: 400, height: 100 }}
-			// 	source={{ uri: this.state.base64Data }}
-			// />
-			// <Card>
-			
+			<Content padder>
+				<Card>
+					<Button onPress={() => { this.createTimer(); this.fetchImage(); }} dark bordered style={{ width: 360, height: 80 }} >
+						<Image
+							style={{ width: 360, height: 75 }}
+							source={{ uri: this.state.base64Data }}
+						/>
+					</Button>
 
-			// 	<CardItem>
-			// 		<Image style={{ resizeMode: 'cover' }} source={{ uri: this.state.base64Data }}/>
-			// 	</CardItem>
-
-			// 	<CardItem>
-			// 		<Icon name={'ios-musical-notes'} style={{ color: '#ED4A6A' }} />
-			// 		<Text>Listen now</Text>
-			// 	</CardItem>
-			// </Card>
-			<Card>
-				<Button dark bordered style={{ width: 360, height: 80 }} >
-					<Image
-						style={{ width: 360, height: 75 }}
-						source={{ uri: this.state.base64Data }}
-					/>
+				</Card>
+				<Button dark bordered
+					onPress={() => { this.clearTimer(); Actions.pop(); }}>
+					<Text>Back</Text>
 				</Button>
-			</Card>
+			</Content>
 		)
 	}
 

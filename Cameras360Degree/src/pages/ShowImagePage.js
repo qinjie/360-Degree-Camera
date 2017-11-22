@@ -6,6 +6,7 @@ import RefeshImage from '../components/RefeshImage';
 
 export default class ShowImagePage extends Component {
   render() {
+    //alert(this.props.key_name + " " + this.props.camera_name + " " + this.props.base_url);
     return (
       <Container>
         <Header>
@@ -15,10 +16,6 @@ export default class ShowImagePage extends Component {
         </Header>
         <Content padder>
           <RefeshImage camera_name={this.props.camera_name} key_name={this.props.key_name} base_url={this.props.base_url} base64Data={this.props.base64Data} />
-          <Button dark bordered
-            onPress={() => { Actions.pop(); }}>
-            <Text>Back</Text>
-          </Button>
         </Content>
       </Container>
     );
