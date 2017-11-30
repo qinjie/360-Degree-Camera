@@ -29,7 +29,7 @@
         "sqs:GetQueueUrl"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:sqs:ap-southeast-1:498107424281:iot-centre-projects"
+      "Resource": "arn:aws:sqs:ap-southeast-1:498107424281:*"
     }
   ]
 }

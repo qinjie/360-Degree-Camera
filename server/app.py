@@ -3,6 +3,8 @@ import os
 import json
 import boto3
 
+from chalicelib.config import SQS_QUEUE, S3_BUCKET
+
 app = Chalice(app_name='server')
 app.debug = True
 
@@ -81,12 +83,12 @@ def s3_signed_url():
 
 # Send a job (in json) to SQS
 # Test:
-# >> echo '{"input": {"picture_0":"360_degree_camera/001/a.jpg", "picture_1":"360_degree_camera/001/b.jpg", "picture_2":"360_degree_camera/001/c.jpg", "picture_3":"360_degree_camera/001/d.jpg"}, "output": "360_degree_camera/001.jpg", "project": "360_degree_camera", "action": "stitch_images"}' | http -v POST https://jyf7s0ji3m.execute-api.ap-southeast-1.amazonaws.com/dev/sqs_queue_job
+# >> echo '{"action": "stitch_images", "node_id":"1", "input": {"picture_0":"360_degree_camera/001/a.jpg", "picture_1":"360_degree_camera/001/b.jpg", "picture_2":"360_degree_camera/001/c.jpg", "picture_3":"360_degree_camera/001/d.jpg"}, "output": "360_degree_camera/001.jpg"}' | http -v POST https://jyf7s0ji3m.execute-api.ap-southeast-1.amazonaws.com/dev/sqs_add_job
 #
-@app.route('/sqs_queue_job', methods=['POST'])
-def sqs_queue_job():
+@app.route('/sqs_add_job', methods=['POST'])
+def sqs_add_job():
     json_data = app.current_request.json_body
-    keys = ['project', 'action', 'input', 'output']
+    keys = ['action', 'input', 'output']
     for key in keys:
         if key not in json_data:
             raise BadRequestError('Data json must contains all keys: ' + ','.join(keys))
@@ -97,11 +99,11 @@ def sqs_queue_job():
             raise BadRequestError('Input json must contains all keys: ' + ','.join(keys_input))
 
     # Add bucket
-    json_data['s3_bucket'] = os.environ.get("S3_BUCKET")
+    json_data['s3_bucket'] = S3_BUCKET
     print(json.dumps(json_data))
 
     sqs = boto3.resource('sqs')
-    queue_name = os.environ.get('SQS_QUEUE')
+    queue_name = SQS_QUEUE
     try:
         queue = sqs.get_queue_by_name(QueueName=queue_name)
     except:
@@ -110,5 +112,4 @@ def sqs_queue_job():
 
     str = json.dumps(json_data)
     response = queue.send_message(MessageBody=str)
-    print(response)
-
+    return response

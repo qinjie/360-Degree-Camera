@@ -1,7 +1,10 @@
 import os
 import shutil
+import json
 
+import boto3
 import requests
+import time
 
 BASE_URL = "https://jyf7s0ji3m.execute-api.ap-southeast-1.amazonaws.com/dev/"
 KEY_PREFIX = "360-degree-camera/"
@@ -65,7 +68,17 @@ def test_s3_signed_download():
                 os.remove(file_path)
             return None
 
+# Test add job to sqs through web service
+def test_sqs_add_job():
+    job_str = '{"action": "stitch_images", "input": {"picture_0":"360_degree_camera/001/a.jpg", "picture_1":"360_degree_camera/001/b.jpg", "picture_2":"360_degree_camera/001/c.jpg", "picture_3":"360_degree_camera/001/d.jpg"}, "output": "360_degree_camera/001.jpg"}'
+    json_body = json.loads(job_str)
+
+    url = BASE_URL + "sqs_add_job"
+    r = requests.post(url, json=json_body)
+    print(r.text)
+
 
 if __name__ == '__main__':
-    test_s3_signed_upload()
-    test_s3_signed_download()
+    # test_s3_signed_upload()
+    # test_s3_signed_download()
+    test_sqs_add_job()
