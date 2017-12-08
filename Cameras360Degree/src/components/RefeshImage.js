@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Icon, Container, Content, Text, Card, Header, Body, Button, Title, CardItem, List, ListItem } from 'native-base';
-import { Image, StyleSheet } from 'react-native';
+import { Image, StyleSheet, Dimensions } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import RNFetchBlob from 'react-native-fetch-blob';
 
@@ -21,7 +21,7 @@ export default class RefeshImage extends Component {
 
 	componentDidMount() {
 		//this.fetchImage();
-		//this.props.update();
+		//this.props.update();	
 		this.createTimer();
 	}
 
@@ -63,7 +63,6 @@ export default class RefeshImage extends Component {
 			.then((res) => {
 				let base64Str = 'data:image/jpeg;base64,' + res.base64();
 				this.setState({ base64Data: base64Str });
-				this.props.updateFunc(base64Str);
 			})
 			.catch((errorMessage, statusCode) => {
 				// error handling
@@ -71,22 +70,17 @@ export default class RefeshImage extends Component {
 	}
 
 	render() {
+		const width = Dimensions.get('window').width - 20;
+		const height = width / 4;
 		return (
-			<Content padder>
-				<Card>
-					<Button onPress={() => { this.createTimer(); this.fetchImage(); }} dark bordered style={{ width: 360, height: 80 }} >
-						<Image
-							style={{ width: 360, height: 75 }}
-							source={{ uri: this.state.base64Data }}
-						/>
-					</Button>
-
-				</Card>
-				<Button dark bordered
-					onPress={() => { this.clearTimer(); Actions.pop({refresh: {data: "DATA DATA"} });Actions.refresh({data:this.state.base64Data, id: this.props.id}); }}>
-					<Text>Back</Text>
+			<Card>
+				<Button onPress={() => { Actions.FullImage({ base64Data: this.state.base64Data, width: width, height: height }); }} dark bordered style={{ width: 360, height: 80 }} >
+					<Image
+						style={{ width: width, height: height }}
+						source={{ uri: this.state.base64Data }}
+					/>
 				</Button>
-			</Content>
+			</Card>
 		)
 	}
 

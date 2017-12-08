@@ -10,7 +10,8 @@ export default class MainPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      listCam: []
+      listCam: [],
+      listId: []
     }
     this.my = './src/my.jpg';
     this.base_url = "https://jyf7s0ji3m.execute-api.ap-southeast-1.amazonaws.com/dev/s3_signed_url/download";
@@ -29,7 +30,8 @@ export default class MainPage extends Component {
   init_list_camera() {
     //fetch list camera
     var listCamera_name = ['001', '002'];
-    this.setState({ listCam: listCamera_name });
+    var listId = ["1","2"];
+    this.setState({ listCam: listCamera_name, listId });
     for (let i = 0; i < this.state.listCam.length; i++) {
       this.fetchImageIndex(i);
     }
@@ -37,9 +39,9 @@ export default class MainPage extends Component {
 
   componentWillReceiveProps(nextProps) {
     //alert("Main" + nextProps.data);
-    console.log("MrDAT");
-    console.log(nextProps);
-    console.log("MrDAT");
+    // console.log("MrDAT");
+    // console.log(nextProps);
+    // console.log("MrDAT");
     this.refs[nextProps.id].updateData(nextProps.data);
   }
 
@@ -47,18 +49,13 @@ export default class MainPage extends Component {
       Actions.ShowImagePage({...props, update: this.update, id: i});
   }
 
-  // componentIsVisible() {
-  //   alert("hihi");
-  //   this.init_list_camera();
-  // }
-
   renderCard() {
     const { listCam, listBase64Data } = this.state;
     const key_prefix = this.key_prefix;
     const base_url = this.base_url;
     if (!listCam) return;
     return listCam.map((camera_name, i) => {
-      return <ImageShower key={i} id={i} ref={i} camera_name={camera_name} key_name={key_prefix + 'Pano/pano' + camera_name + '.jpg'} base_url={base_url} />
+      return <ImageShower key={i} id={i} ref={i} camera_id={this.state.listId[i]} camera_name={camera_name} key_prefix={key_prefix} key_name={key_prefix + 'Pano/pano' + camera_name + '.jpg'} base_url={base_url} />
     })
   }
 
