@@ -15,6 +15,10 @@ export default class MainPage extends Component {
     this.my = './src/my.jpg';
     this.base_url = "https://jyf7s0ji3m.execute-api.ap-southeast-1.amazonaws.com/dev/s3_signed_url/download";
     this.key_prefix = "360-degree-camera/";
+    this.go_ShowImagePage = this.go_ShowImagePage.bind(this);
+    //this.update = this.update.bind(this);
+    this.props.test = false;
+    this.test = false;
   }
 
 
@@ -31,13 +35,30 @@ export default class MainPage extends Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    //alert("Main" + nextProps.data);
+    console.log("MrDAT");
+    console.log(nextProps);
+    console.log("MrDAT");
+    this.refs[nextProps.id].updateData(nextProps.data);
+  }
+
+  go_ShowImagePage(props, i) {
+      Actions.ShowImagePage({...props, update: this.update, id: i});
+  }
+
+  // componentIsVisible() {
+  //   alert("hihi");
+  //   this.init_list_camera();
+  // }
+
   renderCard() {
     const { listCam, listBase64Data } = this.state;
     const key_prefix = this.key_prefix;
     const base_url = this.base_url;
     if (!listCam) return;
-    return listCam.map((camera_name) => {
-      return <ImageShower camera_name={camera_name} key_name={key_prefix + 'Pano/pano' + camera_name + '.jpg'} base_url={base_url} />
+    return listCam.map((camera_name, i) => {
+      return <ImageShower key={i} id={i} ref={i} camera_name={camera_name} key_name={key_prefix + 'Pano/pano' + camera_name + '.jpg'} base_url={base_url} />
     })
   }
 
@@ -46,7 +67,7 @@ export default class MainPage extends Component {
       <Container>
         <Header>
           <Body>
-            <Title>All camera</Title>
+            <Title>All Pano</Title>
           </Body>
         </Header>
         <Content padder>

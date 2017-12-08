@@ -21,6 +21,7 @@ export default class RefeshImage extends Component {
 
 	componentDidMount() {
 		//this.fetchImage();
+		//this.props.update();
 		this.createTimer();
 	}
 
@@ -32,7 +33,7 @@ export default class RefeshImage extends Component {
 
 	clearTimer() {
 		//alert("Clear Timer");
-		clearInterval(this.refresh);
+		clearInterval(this.refesh);
 	}
 
 	fetchImage() {
@@ -62,6 +63,7 @@ export default class RefeshImage extends Component {
 			.then((res) => {
 				let base64Str = 'data:image/jpeg;base64,' + res.base64();
 				this.setState({ base64Data: base64Str });
+				this.props.updateFunc(base64Str);
 			})
 			.catch((errorMessage, statusCode) => {
 				// error handling
@@ -81,7 +83,7 @@ export default class RefeshImage extends Component {
 
 				</Card>
 				<Button dark bordered
-					onPress={() => { this.clearTimer(); Actions.pop(); }}>
+					onPress={() => { this.clearTimer(); Actions.pop({refresh: {data: "DATA DATA"} });Actions.refresh({data:this.state.base64Data, id: this.props.id}); }}>
 					<Text>Back</Text>
 				</Button>
 			</Content>
