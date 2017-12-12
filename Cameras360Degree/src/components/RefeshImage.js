@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Icon, Container, Content, Text, Card, Header, Body, Button, Title, CardItem, List, ListItem } from 'native-base';
-import { Image, StyleSheet, Dimensions } from 'react-native';
+import { Image, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import RNFetchBlob from 'react-native-fetch-blob';
 
@@ -21,7 +21,10 @@ export default class RefeshImage extends Component {
 
 	componentDidMount() {
 		//this.fetchImage();
-		//this.props.update();	
+		//this.props.update();
+		if (this.state.base64Data.length < 50 ) {
+			this.fetchImage();
+		}
 		this.createTimer();
 	}
 
@@ -63,6 +66,8 @@ export default class RefeshImage extends Component {
 			.then((res) => {
 				let base64Str = 'data:image/jpeg;base64,' + res.base64();
 				this.setState({ base64Data: base64Str });
+				//update data on Show Image parent
+				this.props.updateFunc(base64Str);
 			})
 			.catch((errorMessage, statusCode) => {
 				// error handling
@@ -74,11 +79,14 @@ export default class RefeshImage extends Component {
 		const height = width / 4;
 		return (
 			<Card>
-				<Button onPress={() => { Actions.FullImage({ base64Data: this.state.base64Data, width: width, height: height }); }} dark bordered style={{ width: 360, height: 80 }} >
-					<Image
-						style={{ width: width, height: height }}
-						source={{ uri: this.state.base64Data }}
-					/>
+				<Button onPress={() => { Actions.FullImage({ base64Data: this.state.base64Data, width: width, height: height }); }} dark bordered style={{ width: 360, height: 80, flex: 1, justifyContent: 'center' }} >
+					{this.state.base64Data.length > 30 ?
+						<Image
+							style={{ width: width, height: height }}
+							source={{ uri: this.state.base64Data }}
+						/>
+						:
+						<ActivityIndicator size="small" color="#00ff00" />}
 				</Button>
 			</Card>
 		)

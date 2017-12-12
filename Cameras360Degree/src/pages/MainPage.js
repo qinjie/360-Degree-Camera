@@ -22,7 +22,6 @@ export default class MainPage extends Component {
     this.test = false;
   }
 
-
   componentDidMount() {
     this.init_list_camera();
   }
@@ -38,7 +37,7 @@ export default class MainPage extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    //alert("Main" + nextProps.data);
+    console.log("Main" + nextProps.data);
     // console.log("MrDAT");
     // console.log(nextProps);
     // console.log("MrDAT");
@@ -64,7 +63,7 @@ export default class MainPage extends Component {
       <Container>
         <Header>
           <Body>
-            <Title>All Pano</Title>
+            <Title>All Units</Title>
           </Body>
         </Header>
         <Content padder>

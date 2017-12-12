@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Container, Content, Text, Card, Header, Body, Button, Title, CardItem, List, ListItem } from 'native-base';
-import { Image, StyleSheet, Modal, Dimensions } from 'react-native';
+import { Image, StyleSheet, Modal, Dimensions, ActivityIndicator } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import RNFetchBlob from 'react-native-fetch-blob';
 import PropTypes from 'prop-types';
@@ -11,6 +11,7 @@ export default class ImageShower extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			loading: false,
 			base64Data: 'data:image/jpeg;base64,',
 		}
 		this.new_base64Data = "";
@@ -22,6 +23,7 @@ export default class ImageShower extends Component {
 
 	componentWillMount() {
 		this.fetchImage();
+		this.setState({ loading: true });
 	}
 
 	fetchImage() {
@@ -41,6 +43,7 @@ export default class ImageShower extends Component {
 				this.fetch_base64data_image(responseJson['url']);
 			})
 			.catch((error) => {
+				this.setState({ loading: false });
 				console.error(error);
 			});
 	}
@@ -53,9 +56,11 @@ export default class ImageShower extends Component {
 				const images = [];
 				images.push(base64Str);
 				this.setState({ images });
+				this.setState({ loading: false })
 			})
 			.catch((errorMessage, statusCode) => {
 				// error handling
+				this.setState({ loading: false });
 			})
 	}
 
@@ -75,20 +80,24 @@ export default class ImageShower extends Component {
 	}
 
 	render() {
+		const {loading} = this.state;
 		const width = Dimensions.get('window').width - 60;
 		const height = width / 4;
 		return (
 			<Card>
-				<Text noted>Unit : {this.props.camera_name}</Text>
-				<CardItem>
-					<Button dark bordered style={{ width: width, height: height }}
-						onPress={() => { Actions.ShowImagePage({ id: this.props.id, updateFunc: this.updateData, camera_name: this.props.camera_name, camera_id: this.props.camera_id, key_name: this.props.key_name, key_prefix: this.props.key_prefix,  base_url: this.props.base_url, base64Data: this.state.base64Data }); }}>
-						<Image
-							style={{ width: width, height: height }}
-							source={{ uri: this.state.base64Data }}
-						/>
-					</Button>
-				</CardItem>
+				<Text noted>Unit {this.props.camera_name}</Text>
+				{ loading ? <ActivityIndicator size="large" color="#0000ff" /> :
+					<CardItem>
+						<Button dark bordered style={{ width: width, height: height }}
+							onPress={() => { Actions.ShowImagePage({ id: this.props.id, updateFunc: this.updateData, camera_name: this.props.camera_name, camera_id: this.props.camera_id, key_name: this.props.key_name, key_prefix: this.props.key_prefix, base_url: this.props.base_url, base64Data: this.state.base64Data }); }}>
+							<Image
+								style={{ width: width, height: height }}
+								source={{ uri: this.state.base64Data }}
+							/>
+						</Button>
+					</CardItem>
+				}
+
 			</Card>
 		)
 	}
