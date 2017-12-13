@@ -186,10 +186,10 @@ export default class ShowImagePage extends Component {
               <View style={{ justifyContent: 'center', paddingLeft: 20, }}>
                 <Text>Camera 4:</Text>
                 <Button dark bordered style={{ width: width, height: height, flex: 1, justifyContent: 'center' }} onPress={() => { Actions.FullImage({ base64Data: this.state.base64Data4, width: width * 2, height: height * 2 }); }}>
-                  {this.state.base64Data2.length > 50 ?
+                  {this.state.base64Data4.length > 50 ?
                     <Image
                       style={{ width: width, height: height }}
-                      source={{ uri: this.state.base64Data2 }}
+                      source={{ uri: this.state.base64Data4 }}
                     /> : <ActivityIndicator size="small" color="#00ff00" />
                   }
                 </Button>
@@ -197,15 +197,20 @@ export default class ShowImagePage extends Component {
             </View>
             {this.state.percent !== -1 ?
               <View >
-                <View>
-                  <Text> Montion: {parseFloat(this.state.percent).toFixed(2)} %</Text>
+                <View style={{ flexDirection: 'row' }}>
+                  <Text> Montion: </Text>
+                  {
+                    this.state.percent === "loading..." ?
+                    <ActivityIndicator size="small" color="#00ff00" />
+                    : <Text> {parseFloat(this.state.percent).toFixed(2)} %</Text>
+                  }
                 </View>
                 <View>
                   <ProgressBarClassic progress={parseFloat(parseFloat(this.state.percent).toFixed(2))} valueStyle={'none'} />
                 </View>
               </View>
               :
-              <Text style={{ color: "red" }}>No motion value on database</Text>
+              <Text style={{ color: "red" }}>No data</Text>
             }
           </View>
         </Content>

@@ -79,7 +79,7 @@ export default class RefeshImage extends Component {
 		const height = width / 4;
 		return (
 			<Card>
-				<Button onPress={() => { Actions.FullImage({ base64Data: this.state.base64Data, width: width, height: height }); }} dark bordered style={{ width: 360, height: 80, flex: 1, justifyContent: 'center' }} >
+				<Button onPress={() => { Actions.FullImage({ base64Data: this.state.base64Data, width: width, height: height }); }} dark bordered style={{ width: width, height: height, flex: 1, justifyContent: 'center' }} >
 					{this.state.base64Data.length > 30 ?
 						<Image
 							style={{ width: width, height: height }}
