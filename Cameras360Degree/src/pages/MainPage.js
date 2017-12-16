@@ -37,10 +37,7 @@ export default class MainPage extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("Main" + nextProps.data);
-    // console.log("MrDAT");
-    // console.log(nextProps);
-    // console.log("MrDAT");
+    //console.log("Main" + nextProps.data);
     this.refs[nextProps.id].updateData(nextProps.data);
   }
 

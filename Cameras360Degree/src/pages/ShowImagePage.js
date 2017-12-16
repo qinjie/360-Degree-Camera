@@ -125,8 +125,9 @@ export default class ShowImagePage extends Component {
 
   render() {
     //alert(this.props.key_name + " " + this.props.camera_name + " " + this.props.base_url);
-    const width = Dimensions.get('window').width / 2 - 40;
+    const width = Dimensions.get('window').width / 2 - 20;
     const height = width * 4 / 5;
+    const padding_left = 7;
     return (
       <Container>
         <View style={{ flexDirection: 'row', }}>
@@ -139,12 +140,12 @@ export default class ShowImagePage extends Component {
           </Button>
         </View>
         <Content padder>
-          <Text>Pano : </Text>
+          <Text style={{color: "green"}}>Panorama</Text>
           <RefeshImage id={this.props.id} updateFunc={this.updateFunc} camera_name={this.props.camera_name} key_name={this.props.key_name} base_url={this.props.base_url} base64Data={this.props.base64Data} />
           <View>
             <View style={{ flexDirection: 'row' }} >
-              <View style={{ justifyContent: 'center', paddingLeft: 20 }}>
-                <Text>Camera 1:</Text>
+              <View style={{ justifyContent: 'center', paddingLeft: padding_left }}>
+                <Text style={{color: "green"}}>Camera 1</Text>
 
                 <Button dark bordered style={{ width: width, height: height, flex: 1, justifyContent: 'center' }} onPress={() => { Actions.FullImage({ base64Data: this.state.base64Data1, width: width * 2, height: height * 2 }); }}>
                   {this.state.base64Data1.length > 50 ?
@@ -157,8 +158,8 @@ export default class ShowImagePage extends Component {
 
               </View>
 
-              <View style={{ justifyContent: 'center', paddingLeft: 20, }}>
-                <Text>Camera 2:</Text>
+              <View style={{ justifyContent: 'center', paddingLeft: padding_left, }}>
+                <Text style={{color: "green"}}>Camera 2</Text>
                 <Button dark bordered style={{ width: width, height: height, flex: 1, justifyContent: 'center' }} onPress={() => { Actions.FullImage({ base64Data: this.state.base64Data2, width: width * 2, height: height * 2 }); }}>
                   {this.state.base64Data2.length > 50 ?
                     <Image
@@ -171,8 +172,8 @@ export default class ShowImagePage extends Component {
             </View>
 
             <View style={{ flexDirection: 'row' }} >
-              <View style={{ justifyContent: 'center', paddingLeft: 20 }}>
-                <Text>Camera 3:</Text>
+              <View style={{ justifyContent: 'center', paddingLeft: padding_left }}>
+                <Text style={{color: "green"}}>Camera 3</Text>
                 <Button dark bordered style={{ width: width, height: height, flex: 1, justifyContent: 'center' }} onPress={() => { Actions.FullImage({ base64Data: this.state.base64Data3, width: width * 2, height: height * 2 }); }}>
                   {this.state.base64Data3.length > 50 ?
                     <Image
@@ -183,8 +184,8 @@ export default class ShowImagePage extends Component {
                 </Button>
               </View>
 
-              <View style={{ justifyContent: 'center', paddingLeft: 20, }}>
-                <Text>Camera 4:</Text>
+              <View style={{ justifyContent: 'center', paddingLeft: padding_left, }}>
+                <Text style={{color: "green"}}>Camera 4</Text>
                 <Button dark bordered style={{ width: width, height: height, flex: 1, justifyContent: 'center' }} onPress={() => { Actions.FullImage({ base64Data: this.state.base64Data4, width: width * 2, height: height * 2 }); }}>
                   {this.state.base64Data4.length > 50 ?
                     <Image
@@ -197,8 +198,9 @@ export default class ShowImagePage extends Component {
             </View>
             {this.state.percent !== -1 ?
               <View >
+              <Text> </Text>
                 <View style={{ flexDirection: 'row' }}>
-                  <Text> Montion: </Text>
+                  <Text style={{color: "green"}}> Density: </Text>
                   {
                     this.state.percent === "loading..." ?
                     <ActivityIndicator size="small" color="#00ff00" />

@@ -85,7 +85,7 @@ export default class ImageShower extends Component {
 		const height = width / 4;
 		return (
 			<Card>
-				<Text noted>Unit {this.props.camera_name}</Text>
+				<Text noted style={{color: "green"}}>Unit {this.props.camera_name}</Text>
 				{ loading ? <ActivityIndicator size="large" color="#0000ff" /> :
 					<CardItem>
 						<Button dark bordered style={{ width: width, height: height }}
