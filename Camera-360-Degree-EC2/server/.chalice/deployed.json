@@ -1,0 +1,12 @@
+{
+  "dev": {
+    "api_handler_name": "iot-360-degree-camera-dev",
+    "api_handler_arn": "arn:aws:lambda:ap-southeast-1:498107424281:function:iot-360-degree-camera-dev",
+    "lambda_functions": {},
+    "backend": "api",
+    "chalice_version": "1.0.4",
+    "rest_api_id": "jyf7s0ji3m",
+    "api_gateway_stage": "dev",
+    "region": "ap-southeast-1"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "version": "2.0",
+  "app_name": "iot-360-degree-camera",
+  "environment_variables": {
+    "S3_BUCKET": "iot-centre-projects",
+    "SQS_QUEUE": "360-degree-camera",
+    "DB_HOST": "iot-centre-rds.crqhd2o1amcg.ap-southeast-1.rds.amazonaws.com",
+    "DB_NAME": "360-degree-camera",
+    "DB_USER": "root",
+    "DB_PASSWORD": "Soe7014Ece"
+  },
+  "tags": {
+    "project": "360-degree-camera"
+  },
+  "lambda_timeout": 30,
+  "lambda_memory_size": 128,
+  "stages": {
+    "dev": {
+      "autogen_policy": false,
+      "api_gateway_stage": "dev",
+      "environment_variables": {
+        "SHARED_CONFIG": "foo",
+        "OTHER_CONFIG": "from-top"
+      }
+    }
+  }
+}

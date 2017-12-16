@@ -1,0 +1,12 @@
+{
+  "dev": {
+    "region": "ap-southeast-1",
+    "api_handler_name": "360-Degree-Image-No-VPC-dev",
+    "api_handler_arn": "arn:aws:lambda:ap-southeast-1:498107424281:function:360-Degree-Image-No-VPC-dev",
+    "rest_api_id": "ipdic6z2s8",
+    "lambda_functions": {},
+    "chalice_version": "1.1.0",
+    "api_gateway_stage": "api",
+    "backend": "api"
+  }
+}
